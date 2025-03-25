@@ -97,9 +97,9 @@ file_name_input = st.text_input("请输入保存的 Excel 文件名称（例如�
 
 if st.button("抓取评论"):
     try:
-        with open("review_headers.json", 'r') as f:
+        with open("review_scraper/review_headers.json", 'r') as f:
             headers = json.load(f)
-        with open("review_payload.json", 'r') as f:
+        with open("review_scraper/.json", 'r') as f:
             payload = json.load(f)
         
         df = extract_bad_reviews(url, page_num, headers, payload)
