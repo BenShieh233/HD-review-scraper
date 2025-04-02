@@ -7,6 +7,8 @@ import time
 import io
 from bs4 import BeautifulSoup
 
+st.set_page_config(layout="wide")
+
 def clean_client_response(text):
     if text:
         soup = BeautifulSoup(text, 'html.parser')
@@ -91,11 +93,17 @@ def extract_bad_reviews(url, page_num, headers, payload, selected_star_ratings):
 # Streamlit UI
 st.title("Home Depot 评论抓取框架（测试版）")
 url = st.text_input("请输入产品网页链接:")
-page_num = st.number_input("页数（请不要超过3）:", min_value=1, max_value=10, value=2, step=1)
 
-# **新增** 允许用户选择星级评论
-star_choices = st.multiselect("选择要爬取的评论星级（可多选）:", [1, 2, 3, 4, 5], default=[1, 2, 3, 4, 5])
+# 创建两列布局
+col1, col2 = st.columns(2)
 
+# 在第一列放置页数选择
+with col1:
+    page_num = st.number_input("页数（请不要超过3）:", min_value=1, max_value=10, value=2, step=1)
+
+# 在第二列放置星级多选框
+with col2:
+    star_choices = st.multiselect("选择要爬取的评论星级（可多选）:", [1, 2, 3, 4, 5], default=[1, 2, 3, 4, 5])
 # 新增文件名输入
 file_name_input = st.text_input("请输入保存的 Excel 文件名称（例如：reviews.xlsx）:")
 
