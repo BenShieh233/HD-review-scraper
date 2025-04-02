@@ -57,7 +57,7 @@ def update_payload(payload, increment):
     payload['variables']['startIndex'] = increment
     return payload
 
-def extract_bad_reviews(url, page_num, headers, payload):
+def extract_bad_reviews(url, page_num, headers, payload, selected_star_ratings):
     itemId = re.search(r'/(\d+)$', url).group(1)
     current_url = re.findall(r'/p/(.+)', url)[0]
     if not itemId:
@@ -66,6 +66,7 @@ def extract_bad_reviews(url, page_num, headers, payload):
     
     headers['X-Current-Url'] = current_url
     payload['variables']['itemId'] = itemId
+    payload['variables']['filters']['starRatings'] = selected_star_ratings
     
     all_reviews = []
     increment = 1
@@ -92,6 +93,9 @@ st.title("Home Depot 评论抓取框架（测试版）")
 url = st.text_input("请输入产品网页链接:")
 page_num = st.number_input("页数（请不要超过3）:", min_value=1, max_value=10, value=2, step=1)
 
+# **新增** 允许用户选择星级评论
+star_choices = st.multiselect("选择要爬取的评论星级（可多选）:", [1, 2, 3, 4, 5], default=[1, 2, 3, 4, 5])
+
 # 新增文件名输入
 file_name_input = st.text_input("请输入保存的 Excel 文件名称（例如：reviews.xlsx）:")
 
@@ -101,8 +105,11 @@ if st.button("抓取评论"):
             headers = json.load(f)
         with open("review_scraper/review_payload.json", 'r') as f:
             payload = json.load(f)
-        
-        df = extract_bad_reviews(url, page_num, headers, payload)
+
+        # **转换用户选择的星级排序**
+        selected_star_ratings = sorted(star_choices, reverse=True)
+        print(selected_star_ratings)
+        df = extract_bad_reviews(url, page_num, headers, payload, selected_star_ratings)
         if not df.empty:
             st.write(df)
             
